@@ -7,7 +7,7 @@ import config
 from config import logger
 
 from utils import seed_everything, get_model, get_dataset, \
-                  get_strategy, wandb_run_name, get_device
+                  get_strategy, wandb_run_name
 
 def get_default_parser():
     parser = argparse.ArgumentParser()
@@ -19,14 +19,12 @@ def get_default_parser():
     return parser
 
 def main(args):
-    # TODO: Different seeds per experiemnt - random (have flag for this)
     # TODO: Different Datasets
     # TODO: Different Models
     # TODO: Different n_init_labelled
     # TODO: Different n_query
     # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
     # TODO: 3 different models: LeNet, ResNet18, ResNet50
-    # TODO: 3 Different Active Learning Strategies: Random, Uncertainty Sampling, bayesian active learning 
 
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
@@ -89,7 +87,6 @@ def main(args):
         if args.wandb:
             wandb.log({'Test Accuracy': acc, 'Round': rd})
             wandb.run.summary['Best Accuracy'] = best_acc
-
     
 
 if __name__ == '__main__':

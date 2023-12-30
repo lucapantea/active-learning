@@ -50,7 +50,14 @@ def get_strategy(strategy_name, strategy_args):
         from strategies import RandomSampling
         logger.info('Using Random Sampling Strategy')
         strategy = RandomSampling(**strategy_args)
-
+    elif strategy_name == 'entropy':
+        from strategies import EntropySampling
+        logger.info('Using Entropy Sampling Strategy')
+        strategy = EntropySampling(**strategy_args)
+    elif strategy_name == 'bald':
+        from strategies import BALDDropout
+        logger.info('Using BALD Strategy')
+        strategy = BALDDropout(n_drop=10, **strategy_args)
     return strategy
 
 def wandb_run_name(args):
