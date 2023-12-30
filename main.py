@@ -15,9 +15,7 @@ def get_default_parser():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--model', type=str, default='lenet')
 
-    # TODO create optimizer args object
     parser.add_argument('--lr', type=float, default=0.001)
-
 
     # Active Lenaring specific arguments
     parser.add_argument('--strategy', type=str, default='random', help='Active learning strategy')
@@ -30,26 +28,28 @@ def get_default_parser():
 def main():
     parser = get_default_parser()
     args = parser.parse_args()
-    model_args = vars(args)
+    params = vars(args)
 
-    device = get_device()
+    params['optimizer_args'] = {'lr': args.lr}
+    params['train_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
+    params['test_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
+
     seed_everything(args.seed)
     dataset = get_dataset(args.dataset, args.data_dir)
-    model = get_model(args.model, device)
-    strategy = get_strategy(args.strategy)
+    model = get_model(args.model, params)
+    strategy = get_strategy(args.strategy, {'dataset': dataset, 'model': model})
 
     # start experiment
     dataset.initialize_labels(args.n_init_labeled)
-    print(f"number of labeled pool: {args.n_init_labeled}")
-    print(f"number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
-    print(f"number of testing pool: {dataset.n_test}")
-    print()
+    print(f"Initial number of labeled pool: {args.n_init_labeled}")
+    print(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
+    print(f"Initial number of testing pool: {dataset.n_test}\n")
 
     # round 0 accuracy
     print("Round 0")
     strategy.fit()
     preds = strategy.predict(dataset.get_test_data())
-    print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
+    print(f"Round 0 testing accuracy: {(dataset.Y_test == preds).sum().item() / len(dataset.Y_test)}\n")
 
     for rd in range(1, args.n_round+1):
         print(f"Round {rd}")
@@ -59,9 +59,14 @@ def main():
 
         # update labels
         strategy.update(query_idxs)
-        strategy.train()
+        strategy.fit()
 
         # calculate accuracy
         preds = strategy.predict(dataset.get_test_data())
         acc = (dataset.Y_test == preds).sum().item() / len(dataset.Y_test)
         print(f"Round {rd} testing accuracy: {acc}")
+        print(f"Round {rd} labeled pool: {dataset.labeled_idxs.sum()}")
+        print(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}\n")
+
+if __name__ == '__main__':
+    main()

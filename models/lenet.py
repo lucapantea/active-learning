@@ -4,7 +4,7 @@ import torch.nn.functional as F
 class LeNet(nn.Module):
     def __init__(self, embedding_dim=84):
         super(LeNet, self).__init__()
-        self.get_embedding_dim = embedding_dim
+        self.embedding_dim = embedding_dim
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
         self.fc1 = nn.Linear(16 * 4 * 4, 120)

@@ -26,17 +26,18 @@ def seed_everything(seed: int):
         torch.backends.mps.deterministic = True
         torch.backends.mps.benchmark = True
     
-def get_model(model_name, model_args):
+def get_model(model_name, params):
     if model_name == 'lenet':
         from models import LeNet
-        model = Model(LeNet, model_args, device=get_device())
+        model = Model(LeNet, params=params, device=get_device())
+
     return model
 
 def get_dataset(dataset_name, data_dir):
     print('Loading datasets...')
     if dataset_name == 'mnist':
         from datasets import get_mnist_al_dataset
-        dataset = get_mnist_al_dataset(data_dir)
+        dataset = get_mnist_al_dataset(data_dir=data_dir)
     
     return dataset
 

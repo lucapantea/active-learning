@@ -21,9 +21,9 @@ class Strategy:
         """
         Updates the dataset with positive and optional negative indices.
         """
-        self.dataset.update(pos_idxs, True)
+        self.dataset.labeled_idxs[pos_idxs] = True
         if neg_idxs:
-            self.dataset.update(neg_idxs, False)
+            self.dataset.labeled_idxs[neg_idxs] = False
 
     def fit(self) -> None:
         """
