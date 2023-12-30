@@ -20,7 +20,8 @@ class Model:
         optimizer = optim.SGD(self.clf.parameters(), **self.params['optimizer_args'])
         loader = DataLoader(data, shuffle=True, **self.params['train_args'])
 
-        for epoch in tqdm(range(1, n_epoch+1), ncols=100):
+        for epoch in (pbar := tqdm(range(1, n_epoch+1), ncols=100, desc="Epoch")):
+            running_loss = .0
             for batch_idx, (x, y, _) in enumerate(loader):
                 x, y = x.to(self.device), y.to(self.device)
                 optimizer.zero_grad()
@@ -29,8 +30,11 @@ class Model:
                 loss.backward()
                 optimizer.step()
 
-                # TODO: evaluate every n epochs
-                # TODO: log performance w wandb
+                # Update running loss
+                running_loss += loss.item()
+
+            average_loss = running_loss / len(loader)
+            pbar.set_description(f"Epoch {epoch} - Loss: {average_loss:.4f}")
 
     def predict(self, data):
         self.clf.eval()

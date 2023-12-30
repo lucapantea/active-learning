@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#SBATCH --partition=[XXX]
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=n_query_experiment
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --time=48:00:00
+#SBATCH --mem=32000M
+#SBATCH --output=../out/slurm_%x.out
+
+# Load modules
+module purge
+module load 2021
+module load Anaconda3/2021.05
+
+# Activate conda environment
+source activate active-learning
+
+# Change to working directory
+cd $HOME/active-learning
+
+
+# MNIST:  60,000 training images and 10,000 testing images
+n_init_labeled_mnist=(10000 20000 30000 40000 50000)
+
+# CIFAR-10: 50,000 training images and 10,000 testing images
+n_init_labeled_cifar=(10000 20000 30000 40000)
+
+# Tiny-ImageNet: 100,000 training images and 10,000 testing images
+n_init_labeled_tiny_imagenet=(10000 20000 30000 40000 50000 60000 70000 80000 90000)
+
+n_init_labeled=$n_init_labeled_mnist
+
+for n in "${n_init_labeled[@]}"
+    do
+        python main.py --n_init_labeled $n --dataset mnist --model lenet --n_queries 1000 
+    done

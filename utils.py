@@ -1,7 +1,7 @@
 import random, os
 import numpy as np
 import torch
-
+from config import logger
 from models import Model
 
 def get_device():
@@ -29,14 +29,15 @@ def seed_everything(seed: int):
 def get_model(model_name, params):
     if model_name == 'lenet':
         from models import LeNet
+        logger.info('Using LeNet')
         model = Model(LeNet, params=params, device=get_device())
 
     return model
 
 def get_dataset(dataset_name, data_dir):
-    print('Loading datasets...')
     if dataset_name == 'mnist':
         from datasets import get_mnist_al_dataset
+        logger.info(f'Loading MNIST dataset from \'./{data_dir}/\'')
         dataset = get_mnist_al_dataset(data_dir=data_dir)
     
     return dataset
@@ -44,6 +45,11 @@ def get_dataset(dataset_name, data_dir):
 def get_strategy(strategy_name, strategy_args):
     if strategy_name == 'random':
         from strategies import RandomSampling
+        logger.info('Using Random Sampling Strategy')
         strategy = RandomSampling(**strategy_args)
 
     return strategy
+
+def wandb_run_name(args):
+    run_name = f"{args.dataset}_{args.model}_{args.strategy}_nlabelled-{args.n_init_labeled}_nquery-{args.n_query}_nround-{args.n_round}"
+    return run_name

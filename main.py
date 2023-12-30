@@ -2,34 +2,42 @@ import torch
 import wandb
 import argparse
 import numpy as np
+import logging
+import config
+from config import logger
 
-from utils import get_device, seed_everything, get_model, get_dataset, get_strategy
+from utils import seed_everything, get_model, get_dataset, \
+                  get_strategy, wandb_run_name, get_device
 
 def get_default_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='mnist')
-    parser.add_argument('--data_dir', type=str, default='data')
-    parser.add_argument('--batch_size', type=int, default=54)
-    parser.add_argument('--num_epochs', type=int, default=10)
-    parser.add_argument('--num_workers', type=int, default=0)
-    parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--model', type=str, default='lenet')
-
-    parser.add_argument('--lr', type=float, default=0.001)
-
-    # Active Lenaring specific arguments
-    parser.add_argument('--strategy', type=str, default='random', help='Active learning strategy')
-    parser.add_argument('--n_init_labeled', type=int, default=10000, help="number of init labeled samples")
-    parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
-    parser.add_argument('--n_round', type=int, default=10, help="number of rounds")
-
+    for arg, default_value in config.DEFAULT_CONFIG.items():
+        if type(default_value) is bool:
+            parser.add_argument(f'--{arg}', action=f'store_{not default_value}'.lower())
+        else:
+            parser.add_argument(f'--{arg}', type=type(default_value), default=default_value)
     return parser
 
-def main():
-    parser = get_default_parser()
-    args = parser.parse_args()
+def main(args):
+    # TODO: Different seeds per experiemnt - random (have flag for this)
+    # TODO: Different Datasets
+    # TODO: Different Models
+    # TODO: Different n_init_labelled
+    # TODO: Different n_query
+    # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
+    # TODO: 3 different models: LeNet, ResNet18, ResNet50
+    # TODO: 3 Different Active Learning Strategies: Random, Uncertainty Sampling, bayesian active learning 
+
+    # Possible Experiment:
+    # - experiment the effect of different active learning strategies under different levels of noise
+    # - experiment with malicious labelling and how different active learning strategies handle it
+        # interesting - here it's important to define what sort of malicious labelling we're talking about
+        # - define possible attacks (https://www.usenix.org/conference/usenixsecurity21/presentation/vicarte)
+        # experiment with other types of accuracy: (https://arxiv.org/pdf/2107.01622.pdf)
+
     params = vars(args)
 
+    logger.info(f'Training on {get_device()}')
     params['optimizer_args'] = {'lr': args.lr}
     params['train_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
     params['test_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
@@ -39,34 +47,61 @@ def main():
     model = get_model(args.model, params)
     strategy = get_strategy(args.strategy, {'dataset': dataset, 'model': model})
 
+    # wandb init
+    run_name = wandb_run_name(args)
+    if args.wandb:
+        wandb.init(project='active-learning', name=run_name,
+                   config=params, reinit=True, entity='msc-ai')
+        wandb.watch(model.net())
+
     # start experiment
     dataset.initialize_labels(args.n_init_labeled)
-    print(f"Initial number of labeled pool: {args.n_init_labeled}")
-    print(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
-    print(f"Initial number of testing pool: {dataset.n_test}\n")
+    logger.debug(f"Initial number of labeled pool: {args.n_init_labeled}")
+    logger.debug(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
+    logger.debug(f"Initial number of testing pool: {dataset.n_test}")
 
-    # round 0 accuracy
-    print("Round 0")
-    strategy.fit()
-    preds = strategy.predict(dataset.get_test_data())
-    print(f"Round 0 testing accuracy: {(dataset.Y_test == preds).sum().item() / len(dataset.Y_test)}\n")
-
+    best_acc = .0
     for rd in range(1, args.n_round+1):
-        print(f"Round {rd}")
+        logger.info(f"Starting Round {rd}")
 
-        # query
+        # Query unlabeled pool
         query_idxs = strategy.query(args.n_query)
 
-        # update labels
+        # Update the dataset with queried indices
         strategy.update(query_idxs)
+
+        # Retrain the model with updated dataset
         strategy.fit()
 
-        # calculate accuracy
+        # Compute the test accuracy
         preds = strategy.predict(dataset.get_test_data())
         acc = (dataset.Y_test == preds).sum().item() / len(dataset.Y_test)
-        print(f"Round {rd} testing accuracy: {acc}")
-        print(f"Round {rd} labeled pool: {dataset.labeled_idxs.sum()}")
-        print(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}\n")
+
+        if acc > best_acc:
+            best_acc = acc
+
+        logger.info(f"Round {rd} testing accuracy: {acc}")
+        logger.debug(f"Round {rd} labeled pool: {dataset.labeled_idxs.sum()}")
+        logger.debug(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}")
+
+        if args.wandb:
+            wandb.log({'Test Accuracy': acc, 'Round': rd})
+            wandb.run.summary['Best Accuracy'] = best_acc
+
+    
 
 if __name__ == '__main__':
-    main()
+    parser = get_default_parser()
+    args = parser.parse_args()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+        logger.handlers[0].setLevel(logging.DEBUG)
+        logger.debug('Debug mode on')
+
+    if args.experiment:
+        for seed in np.random.randint(0, 1000, 3):
+            logger.info(f"Running experiment with seed {seed}")
+            args.seed = seed
+    else:
+        logger.info(f"Running experiment with seed {args.seed}")
+    main(args)
