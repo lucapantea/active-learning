@@ -14,7 +14,7 @@ DEFAULT_CONFIG = {
     'n_init_labeled': 10000,
     'n_query': 1000,
     'n_round': 10,
-    'wandb': False,
+    'wandb': True,
     'experiment': False,
     'debug': False
 }
