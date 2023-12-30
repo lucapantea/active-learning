@@ -8,11 +8,14 @@ def get_device():
     mps = torch.backends.mps.is_available()
     cuda = torch.cuda.is_available()
     if mps:
-        return torch.device('mps')
+        device = 'mps'
     elif cuda:
-        return torch.device('cuda')
+        device = 'cuda'
     else:
-        return torch.device('cpu')
+        device = 'cpu'
+    logger.info('Training on' + f' {device}'.upper())
+    return torch.device(device)
+
 
 def seed_everything(seed: int):
     random.seed(seed)

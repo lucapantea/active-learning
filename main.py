@@ -37,7 +37,6 @@ def main(args):
 
     params = vars(args)
 
-    logger.info(f'Training on {get_device()}')
     params['optimizer_args'] = {'lr': args.lr}
     params['train_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
     params['test_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
@@ -61,6 +60,8 @@ def main(args):
     logger.debug(f"Initial number of testing pool: {dataset.n_test}")
 
     best_acc = .0
+
+    # Active Learning Rounds
     for rd in range(1, args.n_round+1):
         logger.info(f"Starting Round {rd}")
 
@@ -77,6 +78,7 @@ def main(args):
         preds = strategy.predict(dataset.get_test_data())
         acc = (dataset.Y_test == preds).sum().item() / len(dataset.Y_test)
 
+        # Save the best accuracy
         if acc > best_acc:
             best_acc = acc
 
