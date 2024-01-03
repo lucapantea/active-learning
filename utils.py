@@ -35,9 +35,15 @@ def get_model(model_name, params):
         logger.info('Using LeNet')
         model = Model(LeNet, params=params, device=get_device())
     if model_name == 'resnet18':
-        from models import ResNet18
+        from models import ResNet
         logger.info('Using ResNet18')
-        model = Model(ResNet18, params=params, device=get_device())
+        params['layers'] = [2, 2, 2, 2]
+        model = Model(ResNet, params=params, device=get_device())
+    if model_name == 'resnet34':
+        from models import ResNet
+        logger.info('Using ResNet34')
+        params['layers'] = [3, 4, 6, 3]
+        model = Model(ResNet, params=params, device=get_device())
     return model
 
 def get_dataset(dataset_name, data_dir):

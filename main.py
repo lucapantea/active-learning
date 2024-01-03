@@ -45,6 +45,7 @@ def main(args):
         params['image_channels'] = 1
         params['num_classes'] = 10
 
+
     seed_everything(args.seed)
     dataset = get_dataset(args.dataset, args.data_dir)
     model = get_model(args.model, params)

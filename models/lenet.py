@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class LeNet(nn.Module):
-    def __init__(self, image_channels, num_classes, embedding_dim=84):
+    def __init__(self, image_channels, num_classes, embedding_dim=84, **kwargs):
         super(LeNet, self).__init__()
         self.embedding_dim = embedding_dim
         self.conv1 = nn.Conv2d(image_channels, 6, kernel_size=5)

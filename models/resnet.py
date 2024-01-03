@@ -32,9 +32,9 @@ class Block(nn.Module):
         return out
     
 
-class ResNet18(nn.Module):
-    def __init__(self, image_channels, num_classes, layers=[2,2,2,2]):
-        super(ResNet18, self).__init__()
+class ResNet(nn.Module):
+    def __init__(self, image_channels, num_classes, layers, **kwargs):
+        super(ResNet, self).__init__()
         self.in_channels = 64
         self.conv1 = nn.Conv2d(image_channels, 64, kernel_size=7, stride=2, padding=3)
         self.bn1 = nn.BatchNorm2d(64)

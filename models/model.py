@@ -11,7 +11,9 @@ class Model:
         self.params = params
         self.device = device
         self.clf = net(image_channels=params['image_channels'],
-                       num_classes=params['num_classes']).to(self.device)
+                       num_classes=params['num_classes'],
+                       layers=params['layers']).to(self.device)
+        
 
         
     def fit(self, data):

@@ -1,3 +1,3 @@
 from .lenet import LeNet
 from .model import Model
-from .resnet import ResNet18
+from .resnet import ResNet
