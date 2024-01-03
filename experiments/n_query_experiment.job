@@ -11,7 +11,7 @@
 
 # Load modules
 module purge
-module load 2021
+module load 2022
 module load Anaconda3/2021.05
 
 # Activate conda environment
@@ -35,4 +35,6 @@ n_init_labeled=$n_init_labeled_mnist
 for n in "${n_init_labeled[@]}"
     do
         python main.py --n_init_labeled $n --dataset mnist --model lenet --n_queries 1000 
+        python main.py --n_init_labeled $n --dataset mnist --model resnet18 --n_queries 1000 
+        python main.py --n_init_labeled $n --dataset mnist --model resnet34 --n_queries 1000 
     done
