@@ -24,7 +24,6 @@ def main(args):
     # TODO: Different n_init_labelled
     # TODO: Different n_query
     # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
-    # TODO: 3 different models: LeNet, ResNet18, GoogLeNet
 
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
@@ -44,7 +43,6 @@ def main(args):
     if args.dataset == 'mnist':
         params['image_channels'] = 1
         params['num_classes'] = 10
-
 
     seed_everything(args.seed)
     dataset = get_dataset(args.dataset, args.data_dir)

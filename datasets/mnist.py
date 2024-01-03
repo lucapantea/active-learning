@@ -1,9 +1,7 @@
 
 import os
-import torch
 import numpy as np 
 from torch.utils.data import Dataset
-from torchvision.io import read_image
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
