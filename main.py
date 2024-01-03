@@ -24,7 +24,7 @@ def main(args):
     # TODO: Different n_init_labelled
     # TODO: Different n_query
     # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
-    # TODO: 3 different models: LeNet, ResNet18, ResNet50
+    # TODO: 3 different models: LeNet, ResNet18, GoogLeNet
 
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
@@ -35,9 +35,15 @@ def main(args):
 
     params = vars(args)
 
+    # Training parameters
     params['optimizer_args'] = {'lr': args.lr}
     params['train_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
     params['test_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
+
+    # Dataset parameters
+    if args.dataset == 'mnist':
+        params['image_channels'] = 1
+        params['num_classes'] = 10
 
     seed_everything(args.seed)
     dataset = get_dataset(args.dataset, args.data_dir)
@@ -49,13 +55,15 @@ def main(args):
     if args.wandb:
         wandb.init(project='active-learning', name=run_name,
                    config=params, reinit=True, entity='msc-ai')
-        wandb.watch(model.net())
+        wandb.watch(model.clf)
 
     # start experiment
     dataset.initialize_labels(args.n_init_labeled)
     logger.debug(f"Initial number of labeled pool: {args.n_init_labeled}")
     logger.debug(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
     logger.debug(f"Initial number of testing pool: {dataset.n_test}")
+    logger.debug(f"Model parameters: {sum(p.numel() for p in model.clf.parameters())}")
+    logger.debug(f"Model architecture: \\{model.clf}")
 
     best_acc = .0
 

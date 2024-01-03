@@ -8,12 +8,13 @@ from tqdm import tqdm
 
 class Model:
     def __init__(self, net, params, device):
-        self.net = net
         self.params = params
         self.device = device
+        self.clf = net(image_channels=params['image_channels'],
+                       num_classes=params['num_classes']).to(self.device)
+
         
     def fit(self, data):
-        self.clf = self.net().to(self.device)
         self.clf.train()
         
         n_epoch = self.params['num_epochs']
