@@ -22,7 +22,6 @@ def main(args):
     # TODO: Different Datasets
     # TODO: Different n_init_labelled
     # TODO: Different n_query
-    # Also have a more "realistic scenario" - 50 samples intitial
 
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
@@ -61,7 +60,8 @@ def main(args):
     dataset.initialize_labels(args.n_init_labeled)
     logger.debug(f"Initial number of labeled pool: {args.n_init_labeled}")
     logger.debug(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
-    logger.debug(f"Initial number of testing pool: {dataset.n_test}")
+    logger.debug(f"Validation set: {dataset.n_valid}")
+    logger.debug(f"Testing set: {dataset.n_test}")
     logger.debug(f"Model parameters: {sum(p.numel() for p in model.clf.parameters())}")
     logger.debug(f"Model architecture: \\{model.clf}")
 
@@ -88,7 +88,7 @@ def main(args):
         if acc > best_acc:
             best_acc = acc
 
-        logger.info(f"Round {rd} testing accuracy: {acc}")
+        logger.info(f"Round {rd} validation accuracy: {acc}")
         logger.debug(f"Round {rd} labeled pool: {dataset.labeled_idxs.sum()}")
         logger.debug(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}")
 

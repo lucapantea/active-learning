@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import Dataset
-from trochvision.datasets import FashionMNIST
+from torchvision.datasets import FashionMNIST
 
 from .data import Data
 

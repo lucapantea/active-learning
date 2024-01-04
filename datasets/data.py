@@ -1,18 +1,20 @@
+import torch
 import numpy as np
 
 class Data:
     def __init__(self, train_dataset, test_dataset, dataloader, transforms, num_valid):
         train_set, val_set = torch.utils.data.random_split(train_dataset, [len(train_dataset)-num_valid, num_valid])
-        self.X_train = train_set.data.numpy()
-        self.Y_train = train_set.targets.numpy()
-        self.X_valid = val_set.data.numpy()
-        self.Y_valid = val_set.targets.numpy()
+        self.X_train = train_set.dataset.data.numpy()
+        self.Y_train = train_set.dataset.targets.numpy()
+        self.X_valid = val_set.dataset.data.numpy()
+        self.Y_valid = val_set.dataset.targets.numpy()
         self.X_test = test_dataset.data.numpy()
         self.Y_test = test_dataset.targets.numpy()
         self.dataloader = dataloader
         self.transforms = transforms
-        self.n_pool = len(X_train)
-        self.n_test = len(X_test)
+        self.n_pool = len(self.X_train)
+        self.n_test = len(self.X_test)
+        self.n_valid = len(val_set)
         self.labeled_idxs = np.zeros(self.n_pool, dtype=bool)
 
     def initialize_labels(self, num):

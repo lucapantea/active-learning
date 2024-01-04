@@ -38,11 +38,11 @@ class Strategy:
         """
         return self.model.predict(test_dataset)
 
-    def predict_proba(self, test_dataset) -> list:
+    def predict_prob(self, test_dataset) -> list:
         """
         Predicts probabilities for the test dataset.
         """
-        return self.model.predict_proba(test_dataset)
+        return self.model.predict_prob(test_dataset)
 
     def predict_prob_dropout(self, test_dataset, n_drop: int) -> list:
         """

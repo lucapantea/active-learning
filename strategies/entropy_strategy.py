@@ -8,7 +8,7 @@ class EntropySampling(Strategy):
 
     def query(self, n):
         unlabeled_idxs, unlabeled_data = self.dataset.get_unlabeled_data()
-        probs = self.predict_prob(unlabeled_data)
+        probs = torch.from_numpy(self.predict_prob(unlabeled_data))
         entropy = -torch.sum(probs * torch.log(probs + 1e-5), dim=1)
         highest_entropy_idxs = torch.argsort(entropy, descending=True)[:n]
         return unlabeled_idxs[highest_entropy_idxs]
