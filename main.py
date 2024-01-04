@@ -19,10 +19,6 @@ def get_default_parser():
     return parser
 
 def main(args):
-    # TODO: Different Datasets
-    # TODO: Different n_init_labelled
-    # TODO: Different n_query
-
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
     # - experiment with malicious labelling and how different active learning strategies handle it

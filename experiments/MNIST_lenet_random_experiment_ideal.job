@@ -21,14 +21,14 @@ cd $HOME/active-learning
 # Ensure wandb online
 wandb online
 
-n_init_labeled=(1000 5000 10000)
+n_init_labeled=(5000 10000)
 num_valid=(5000)
-n_query=(500 1000)
+n_query=(1000)
 
 for n in "${n_init_labeled[@]}"; do
     for v in "${num_valid[@]}"; do
         for q in "${n_query[@]}"; do
-            python main.py --experiment \
+            python main.py \
                            --debug \
                            --strategy random \
                            --dataset mnist \

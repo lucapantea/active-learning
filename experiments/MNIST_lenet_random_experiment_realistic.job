@@ -2,7 +2,7 @@
 
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
-#SBATCH --job-name=MNIST_Experiment
+#SBATCH --job-name=MNIST_Experiment-realistic
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=48:00:00
@@ -21,14 +21,14 @@ cd $HOME/active-learning
 # Ensure wandb online
 wandb online
 
-n_init_labeled=(10 50 100)
-num_valid=(100 250)
-n_query=(10 50 100)
+n_init_labeled=(50 100)
+num_valid=(250)
+n_query=(50 100)
 
 for n in "${n_init_labeled[@]}"; do
     for v in "${num_valid[@]}"; do
         for q in "${n_query[@]}"; do
-            python main.py --experiment \
+            python main.py \
                            --debug \
                            --strategy random \
                            --dataset mnist \
