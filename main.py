@@ -23,6 +23,7 @@ def main(args):
     # TODO: Different n_init_labelled
     # TODO: Different n_query
     # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
+    # Also have a more "realistic scenario" - 50 samples intitial
 
     # Possible Experiment:
     # - experiment the effect of different active learning strategies under different levels of noise
