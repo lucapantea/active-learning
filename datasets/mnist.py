@@ -21,7 +21,7 @@ class MNIST_Dataset(Dataset):
         x = self.transforms(x)
         return x, y, index
         
-def get_mnist_al_dataset(data_dir):
+def get_mnist_al_dataset(data_dir, num_valid):
     data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), data_dir)
     os.makedirs(data_path, exist_ok=True)
 
@@ -33,10 +33,4 @@ def get_mnist_al_dataset(data_dir):
 
     train_dataset = MNIST(root=data_path, train=True, target_transform=mnist_transform, download=True)
     test_dataset = MNIST(root=data_path, train=False, target_transform=mnist_transform, download=True)
-
-    X_train = train_dataset.data.numpy()
-    Y_train = train_dataset.targets.numpy()
-    X_test = test_dataset.data.numpy()
-    Y_test = test_dataset.targets.numpy()
-
-    return Data(X_train, Y_train, X_test, Y_test, MNIST_Dataset, mnist_transform)
+    return Data(train_dataset, test_dataset, MNIST_Dataset, mnist_transform, num_valid)

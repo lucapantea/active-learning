@@ -46,12 +46,19 @@ def get_model(model_name, params):
         model = Model(ResNet, params=params, device=get_device())
     return model
 
-def get_dataset(dataset_name, data_dir):
+def get_dataset(dataset_name, data_dir, num_valid):
     if dataset_name == 'mnist':
         from datasets import get_mnist_al_dataset
         logger.info(f'Loading MNIST dataset from \'./{data_dir}/\'')
-        dataset = get_mnist_al_dataset(data_dir=data_dir)
-    
+        dataset = get_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
+    if dataset_name == 'cifar10':
+        from datasets import get_cifar10_al_dataset
+        logger.info(f'Loading CIFAR10 dataset from \'./{data_dir}/\'')
+        dataset = get_cifar10_al_dataset(data_dir=data_dir, num_valid=num_valid)
+    if dataset_name == 'fashion_mnist':
+        from datasets import get_fashion_mnist_al_dataset
+        logger.info(f'Loading FashionMNIST dataset from \'./{data_dir}/\'')
+        dataset = get_fashion_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
     return dataset
 
 def get_strategy(strategy_name, strategy_args):

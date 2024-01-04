@@ -22,7 +22,6 @@ def main(args):
     # TODO: Different Datasets
     # TODO: Different n_init_labelled
     # TODO: Different n_query
-    # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
     # Also have a more "realistic scenario" - 50 samples intitial
 
     # Possible Experiment:
@@ -40,12 +39,14 @@ def main(args):
     params['test_args'] = {'batch_size': args.batch_size, 'num_workers': args.num_workers}
 
     # Dataset parameters
-    if args.dataset == 'mnist':
+    params['num_classes'] = 10
+    if args.dataset == 'mnist' or args.dataset == 'fashion_mnist':
         params['image_channels'] = 1
-        params['num_classes'] = 10
+    if args.dataset == 'cifar10':
+        params['image_channels'] = 3
 
     seed_everything(args.seed)
-    dataset = get_dataset(args.dataset, args.data_dir)
+    dataset = get_dataset(args.dataset, args.data_dir, args.num_valid)
     model = get_model(args.model, params)
     strategy = get_strategy(args.strategy, {'dataset': dataset, 'model': model})
 
@@ -80,8 +81,8 @@ def main(args):
         strategy.fit()
 
         # Compute the test accuracy
-        preds = strategy.predict(dataset.get_test_data())
-        acc = (dataset.Y_test == preds).sum().item() / len(dataset.Y_test)
+        preds = strategy.predict(dataset.get_validation_data())
+        acc = (dataset.Y_valid == preds).sum().item() / len(dataset.Y_valid)
 
         # Save the best accuracy
         if acc > best_acc:
@@ -92,9 +93,19 @@ def main(args):
         logger.debug(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}")
 
         if args.wandb:
-            wandb.log({'Test Accuracy': acc, 'Round': rd})
+            wandb.log({'Validation Accuracy': acc, 'Round': rd})
             wandb.run.summary['Best Accuracy'] = best_acc
     
+    # Final test error
+    preds = strategy.predict(dataset.get_test_data())
+    test_acc = (dataset.Y_test == preds).sum().item() / len(dataset.Y_test)
+    test_error = 1 - test_acc
+    logger.info(f"Final test accuracy: {test_acc}")
+    logger.info(f"Final test error: {test_error}")
+
+    if args.wandb:
+        wandb.run.summary['Test Accuracy'] = test_acc
+        wandb.run.summary['Test Error'] = test_error
 
 if __name__ == '__main__':
     parser = get_default_parser()

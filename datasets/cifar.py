@@ -19,7 +19,7 @@ class CIFAR10_Dataset(Dataset):
         x = self.transforms(x)
         return x, y, index
 
-def get_cifar10_al_dataset(data_dir):
+def get_cifar10_al_dataset(data_dir, num_valid):
     data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), data_dir)
     os.makedirs(data_path, exist_ok=True)
 
@@ -33,9 +33,4 @@ def get_cifar10_al_dataset(data_dir):
     train_dataset = CIFAR10(root=data_path, train=True, target_transform=transforms, download=True)
     test_dataset = CIFAR10(root=data_path, train=False, target_transform=transforms, download=True)
 
-    X_train = train_dataset.data.numpy()
-    Y_train = train_dataset.targets.numpy()
-    X_test = test_dataset.data.numpy()
-    Y_test = test_dataset.targets.numpy()
-
-    return Data(X_train, Y_train, X_test, Y_test, CIFAR10_Dataset, transforms)
+    return Data(train_dataset, test_dataset, CIFAR10_Dataset, transforms, num_valid)

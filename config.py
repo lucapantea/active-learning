@@ -6,6 +6,7 @@ DEFAULT_CONFIG = {
     'data_dir': 'data',
     'batch_size': 64,
     'epochs': 10,
+    'num_valid': 1000,
     'num_workers': 0,
     'seed': 42,
     'model': 'lenet',
