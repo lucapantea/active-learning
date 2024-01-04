@@ -22,14 +22,14 @@ cd $HOME/active-learning
 wandb online
 
 # Realistic values
-n_init_labeled_realistic=
-num_valid_realistic=
-n_query_realistic=
+n_init_labeled_realistic=100
+num_valid_realistic=250
+n_query_realistic=10
 
 # Ideal values
-n_init_labeled_ideal=
-num_valid_ideal=
-n_query_ideal=
+# n_init_labeled_ideal=
+# num_valid_ideal=
+# n_query_ideal=
 
 python main.py --experiment \
                --debug \
@@ -42,13 +42,13 @@ python main.py --experiment \
                --n_init_labeled $n_init_labeled_realistic \
                --n_query $n_query_realistic
 
-python main.py --experiment \
-               --debug \
-               --strategy random \
-               --dataset mnist \
-               --model resnet18 \
-               --epochs 100 \
-               --n_round 100 \
-               --num_valid $num_valid_ideal \
-               --n_init_labeled $n_init_labeled_ideal \
-               --n_query $n_query_ideal
+# python main.py --experiment \
+#                --debug \
+#                --strategy random \
+#                --dataset mnist \
+#                --model resnet18 \
+#                --epochs 100 \
+#                --n_round 100 \
+#                --num_valid $num_valid_ideal \
+#                --n_init_labeled $n_init_labeled_ideal \
+#                --n_query $n_query_ideal
