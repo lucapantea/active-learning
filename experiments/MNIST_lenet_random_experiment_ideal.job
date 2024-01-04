@@ -21,9 +21,9 @@ cd $HOME/active-learning
 # Ensure wandb online
 wandb online
 
-n_init_labeled=(250 1000 10000)
-num_valid=(500 1000 2500)
-n_query=(250 1000)
+n_init_labeled=(1000 5000 10000)
+num_valid=(5000)
+n_query=(500 1000)
 
 for n in "${n_init_labeled[@]}"; do
     for v in "${num_valid[@]}"; do
