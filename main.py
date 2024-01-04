@@ -20,7 +20,6 @@ def get_default_parser():
 
 def main(args):
     # TODO: Different Datasets
-    # TODO: Different Models
     # TODO: Different n_init_labelled
     # TODO: Different n_query
     # TODO: 3 different datasets: ImageNet, CIFAR10, MNIST
@@ -108,6 +107,7 @@ if __name__ == '__main__':
         for seed in np.random.randint(0, 1000, 3):
             logger.info(f"Running experiment with seed {seed}")
             args.seed = seed
+            main(args)
     else:
         logger.info(f"Running experiment with seed {args.seed}")
-    main(args)
+        main(args)

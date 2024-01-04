@@ -10,16 +10,12 @@ class Model:
     def __init__(self, net, params, device):
         self.params = params
         self.device = device
-        self.clf = net(image_channels=params['image_channels'],
-                       num_classes=params['num_classes'],
-                       layers=params['layers']).to(self.device)
-        
-
+        self.clf = net(**params).to(self.device)
         
     def fit(self, data):
         self.clf.train()
         
-        n_epoch = self.params['num_epochs']
+        n_epoch = self.params['epochs']
         optimizer = optim.SGD(self.clf.parameters(), **self.params['optimizer_args'])
         loader = DataLoader(data, shuffle=True, **self.params['train_args'])
 

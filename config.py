@@ -5,7 +5,7 @@ DEFAULT_CONFIG = {
     'dataset': 'mnist',
     'data_dir': 'data',
     'batch_size': 64,
-    'num_epochs': 10,
+    'epochs': 10,
     'num_workers': 0,
     'seed': 42,
     'model': 'lenet',
