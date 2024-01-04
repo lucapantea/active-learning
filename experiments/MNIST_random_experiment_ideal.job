@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --job-name=MNIST_Experiment
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --time=48:00:00
+#SBATCH --output=../out/slurm_output_%x.out
+
+module purge
+module load 2022
+module load Anaconda3/2022.05
+
+# Activate conda environment
+source activate active-learning
+
+# Change to working directory
+cd $HOME/active-learning
+
+# Ensure wandb online
+wandb online
+
+n_init_labeled=(250 1000 10000)
+num_valid=(500 1000 2500)
+n_query=(250 1000)
+
+for n in "${n_init_labeled[@]}"; do
+    for v in "${num_valid[@]}"; do
+        for q in "${n_query[@]}"; do
+            python main.py --experiment \
+                           --debug \
+                           --strategy random \
+                           --dataset mnist \
+                           --model lenet \
+                           --epochs 100 \
+                           --n_round 100 \
+                           --num_valid $v \
+                           --n_init_labeled $n \
+                           --n_query $q
+        done
+    done
+done
