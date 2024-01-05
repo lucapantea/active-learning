@@ -3,7 +3,7 @@ import os
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.datasets import MNIST
-
+from PIL import Image
 from .data import Data
 
 class MNIST_Dataset(Dataset):
@@ -18,6 +18,7 @@ class MNIST_Dataset(Dataset):
     def __getitem__(self, index):
         x = self.data[index]
         y = self.target[index]
+        x = Image.fromarray(x.numpy(), mode='L')
         x = self.transforms(x)
         return x, y, index
         
@@ -26,7 +27,6 @@ def get_mnist_al_dataset(data_dir, num_valid):
     os.makedirs(data_path, exist_ok=True)
 
     mnist_transform = transforms.Compose([
-        transforms.ToPILImage(),
         transforms.ToTensor(), 
         transforms.Normalize((0.1307,), (0.3081,)) # zero mean, unit std
     ])
