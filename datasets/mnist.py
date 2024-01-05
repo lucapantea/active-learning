@@ -18,7 +18,7 @@ class MNIST_Dataset(Dataset):
     def __getitem__(self, index):
         x = self.data[index]
         y = self.target[index]
-        x = Image.fromarray(x.numpy(), mode='L')
+        x = Image.fromarray(x, mode='L')
         x = self.transforms(x)
         return x, y, index
         

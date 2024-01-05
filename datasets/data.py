@@ -8,7 +8,6 @@ class Data:
         train_set, val_set = torch.utils.data.random_split(train_dataset, [len(train_dataset)-num_valid, num_valid])
 
         def make_ndarray(x):
-            logger.debug(f'x: {type(x)}')
             if isinstance(x, np.ndarray):
                 return x
             if isinstance(x, list):

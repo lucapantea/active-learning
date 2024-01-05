@@ -37,20 +37,32 @@ def main(args):
     params['num_classes'] = 10
     if args.dataset == 'mnist' or args.dataset == 'fashion_mnist':
         params['image_channels'] = 1
+        params['feature_map_dim'] = 16 * 4 * 4 * params['image_channels']
     if args.dataset == 'cifar10':
         params['image_channels'] = 3
+        params['feature_map_dim'] = 16 * 5 * 5 * params['image_channels']
 
-    seed_everything(args.seed)
+    # Initialize the dataset
     dataset = get_dataset(args.dataset, args.data_dir, args.num_valid)
+
+    # Initialize the model
     model = get_model(args.model, params)
+
+    # Initialize the active learning strategy
     strategy = get_strategy(args.strategy, {'dataset': dataset, 'model': model})
 
-    # wandb init
+    # Remove useless parameters
+    del params['feature_map_dim']
+      
+    # Initialize cloud logging through wandb
     run_name = wandb_run_name(args)
     if args.wandb:
         wandb.init(project='active-learning', name=run_name,
                    config=params, reinit=True, entity='msc-ai')
         wandb.watch(model.clf)
+
+    # Use the same seed for reproducibility
+    seed_everything(args.seed)
 
     # start experiment
     dataset.initialize_labels(args.n_init_labeled)
