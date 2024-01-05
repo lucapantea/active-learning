@@ -34,16 +34,18 @@ def get_model(model_name, params):
         from models import LeNet
         logger.info('Using LeNet')
         model = Model(LeNet, params=params, device=get_device())
-    if model_name == 'resnet18':
+    elif model_name == 'resnet18':
         from models import ResNet
         logger.info('Using ResNet18')
         params['layers'] = [2, 2, 2, 2]
         model = Model(ResNet, params=params, device=get_device())
-    if model_name == 'resnet34':
+    elif model_name == 'resnet34':
         from models import ResNet
         logger.info('Using ResNet34')
         params['layers'] = [3, 4, 6, 3]
         model = Model(ResNet, params=params, device=get_device())
+    else:
+        raise NotImplementedError(f'Model {model_name} not implemented')
     return model
 
 def get_dataset(dataset_name, data_dir, num_valid):
@@ -51,14 +53,16 @@ def get_dataset(dataset_name, data_dir, num_valid):
         from datasets import get_mnist_al_dataset
         logger.info(f'Loading MNIST dataset from \'./{data_dir}/\'')
         dataset = get_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
-    if dataset_name == 'cifar10':
+    elif dataset_name == 'cifar10':
         from datasets import get_cifar10_al_dataset
         logger.info(f'Loading CIFAR10 dataset from \'./{data_dir}/\'')
         dataset = get_cifar10_al_dataset(data_dir=data_dir, num_valid=num_valid)
-    if dataset_name == 'fashion_mnist':
+    elif dataset_name == 'fashion_mnist':
         from datasets import get_fashion_mnist_al_dataset
         logger.info(f'Loading FashionMNIST dataset from \'./{data_dir}/\'')
         dataset = get_fashion_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
+    else:
+        raise NotImplementedError(f'Dataset {dataset_name} not implemented')
     return dataset
 
 def get_strategy(strategy_name, strategy_args):
@@ -74,6 +78,8 @@ def get_strategy(strategy_name, strategy_args):
         from strategies import BALDDropout
         logger.info('Using BALD Strategy')
         strategy = BALDDropout(n_drop=10, **strategy_args)
+    else:
+        raise NotImplementedError(f'Strategy {strategy_name} not implemented')
     return strategy
 
 def wandb_run_name(args):

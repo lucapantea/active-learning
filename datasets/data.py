@@ -1,15 +1,26 @@
 import torch
 import numpy as np
 
+from config import logger
+
 class Data:
     def __init__(self, train_dataset, test_dataset, dataloader, transforms, num_valid):
         train_set, val_set = torch.utils.data.random_split(train_dataset, [len(train_dataset)-num_valid, num_valid])
-        self.X_train = train_set.dataset.data.numpy()
-        self.Y_train = train_set.dataset.targets.numpy()
-        self.X_valid = val_set.dataset.data.numpy()
-        self.Y_valid = val_set.dataset.targets.numpy()
-        self.X_test = test_dataset.data.numpy()
-        self.Y_test = test_dataset.targets.numpy()
+
+        def make_ndarray(x):
+            logger.debug(f'x: {type(x)}')
+            if isinstance(x, np.ndarray):
+                return x
+            if isinstance(x, list):
+                return np.array(x)
+            return x.numpy()
+        
+        self.X_train = make_ndarray(train_set.dataset.data)
+        self.Y_train = make_ndarray(train_set.dataset.targets)
+        self.X_valid = make_ndarray(val_set.dataset.data)
+        self.Y_valid = make_ndarray(val_set.dataset.targets)
+        self.X_test = make_ndarray(test_dataset.data)
+        self.Y_test = make_ndarray(test_dataset.targets)
         self.dataloader = dataloader
         self.transforms = transforms
         self.n_pool = len(self.X_train)
