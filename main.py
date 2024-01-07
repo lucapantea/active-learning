@@ -58,7 +58,7 @@ def main(args):
     if args.wandb:
         wandb.init(project='active-learning', name=run_name,
                    config=params, reinit=True, entity='msc-ai',
-                   tags=['latest'])
+                   tags=['experiments'])
 
     # Use the same seed for reproducibility
     seed_everything(args.seed)
