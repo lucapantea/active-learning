@@ -48,19 +48,36 @@ def get_model(model_name, params):
         raise NotImplementedError(f'Model {model_name} not implemented')
     return model
 
-def get_dataset(dataset_name, data_dir, num_valid):
+def get_noise(noise, noise_rate):
+    if noise == 'none':
+        noise_transform = None
+    elif noise == 'gaussian':
+        from datasets import AddGaussianNoise
+        logger.info(f'Adding Gaussian Noise with mean=0 and std=1, noise rate={noise_rate}')  
+        noise_transform = AddGaussianNoise(mean=0., std=1.)
+    elif noise == 'salt_and_pepper':
+        from datasets import AddSaltAndPepperNoise
+        logger.info(f'Adding Salt and Pepper Noise with noise rate={noise_rate}')  
+        noise_transform = AddSaltAndPepperNoise(noise_rate=0.1)
+    else:
+        raise NotImplementedError(f'Noise {noise} not implemented')
+    return noise_transform
+
+def get_dataset(dataset_name, data_dir, num_valid, noise='none', noise_rate=0.):
+    noise_transform = get_noise(noise, noise_rate)
+
     if dataset_name == 'mnist':
         from datasets import get_mnist_al_dataset
         logger.info(f'Loading MNIST dataset from \'./{data_dir}/\'')
-        dataset = get_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
+        dataset = get_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid, noise_transform=noise_transform, noise_rate=noise_rate)
     elif dataset_name == 'cifar10':
         from datasets import get_cifar10_al_dataset
         logger.info(f'Loading CIFAR10 dataset from \'./{data_dir}/\'')
-        dataset = get_cifar10_al_dataset(data_dir=data_dir, num_valid=num_valid)
+        dataset = get_cifar10_al_dataset(data_dir=data_dir, num_valid=num_valid, noise_transform=noise_transform, noise_rate=noise_rate)
     elif dataset_name == 'fashion_mnist':
         from datasets import get_fashion_mnist_al_dataset
         logger.info(f'Loading FashionMNIST dataset from \'./{data_dir}/\'')
-        dataset = get_fashion_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid)
+        dataset = get_fashion_mnist_al_dataset(data_dir=data_dir, num_valid=num_valid, noise_transform=noise_transform, noise_rate=noise_rate)
     else:
         raise NotImplementedError(f'Dataset {dataset_name} not implemented')
     return dataset

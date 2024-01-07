@@ -17,7 +17,9 @@ DEFAULT_CONFIG = {
     'n_round': 10,
     'wandb': True,
     'experiment': False,
-    'debug': False
+    'debug': False,
+    'noise': 'none', # can be gaussian, salt_and_pepper, or none
+    'noise_rate': 0.0,
 }
 
 LOG_LEVEL = logging.INFO

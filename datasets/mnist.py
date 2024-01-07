@@ -1,4 +1,3 @@
-
 import os
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -22,7 +21,7 @@ class MNIST_Dataset(Dataset):
         x = self.transforms(x)
         return x, y, index
         
-def get_mnist_al_dataset(data_dir, num_valid):
+def get_mnist_al_dataset(data_dir, num_valid, noise_transform=None, noise_rate=0.0):
     data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), data_dir)
     os.makedirs(data_path, exist_ok=True)
 
@@ -30,6 +29,11 @@ def get_mnist_al_dataset(data_dir, num_valid):
         transforms.ToTensor(), 
         transforms.Normalize((0.1307,), (0.3081,)) # zero mean, unit std
     ])
+
+    if noise_transform is not None:
+        mnist_transform.transforms.append( 
+            transforms.RandomApply([noise_transform], p=noise_rate)
+        )   
 
     train_dataset = MNIST(root=data_path, train=True, target_transform=mnist_transform, download=True)
     test_dataset = MNIST(root=data_path, train=False, target_transform=mnist_transform, download=True)

@@ -23,7 +23,7 @@ wandb online
 
 # Realistic values
 n_init_labeled_realistic=100
-num_valid_realistic=250
+num_valid_realistic=300
 n_query_realistic=10
 
 # # Ideal values

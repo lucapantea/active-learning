@@ -5,7 +5,9 @@ import numpy as np
 import logging
 import config
 from config import logger
-
+import pprint
+from termcolor import colored
+from collections import defaultdict
 from utils import seed_everything, get_model, get_dataset, \
                   get_strategy, wandb_run_name
 
@@ -43,23 +45,20 @@ def main(args):
         params['feature_map_dim'] = 16 * 5 * 5 * params['image_channels']
 
     # Initialize the dataset
-    dataset = get_dataset(args.dataset, args.data_dir, args.num_valid)
+    dataset = get_dataset(args.dataset, args.data_dir, args.num_valid, args.noise, args.noise_rate)
 
     # Initialize the model
     model = get_model(args.model, params)
 
     # Initialize the active learning strategy
     strategy = get_strategy(args.strategy, {'dataset': dataset, 'model': model})
-
-    # Remove useless parameters
-    del params['feature_map_dim']
       
     # Initialize cloud logging through wandb
     run_name = wandb_run_name(args)
     if args.wandb:
         wandb.init(project='active-learning', name=run_name,
-                   config=params, reinit=True, entity='msc-ai')
-        wandb.watch(model.clf)
+                   config=params, reinit=True, entity='msc-ai',
+                   tags=['latest'])
 
     # Use the same seed for reproducibility
     seed_everything(args.seed)
@@ -70,17 +69,33 @@ def main(args):
     logger.debug(f"Initial number of unlabeled pool: {dataset.n_pool-args.n_init_labeled}")
     logger.debug(f"Validation set: {dataset.n_valid}")
     logger.debug(f"Testing set: {dataset.n_test}")
-    logger.debug(f"Model parameters: {sum(p.numel() for p in model.clf.parameters())}")
-    logger.debug(f"Model architecture: \\{model.clf}")
 
     best_acc = .0
+
+    # Initial round - train the model with the initial labeled pool
+    logger.info("Starting Round 0")
+    strategy.fit()
+    preds = strategy.predict(dataset.get_validation_data())
+    acc = (dataset.Y_valid == preds).sum().item() / len(dataset.Y_valid)
+    logger.info(f"Round 0 validation accuracy: {acc}")
 
     # Active Learning Rounds
     for rd in range(1, args.n_round+1):
         logger.info(f"Starting Round {rd}")
 
+        uniques = np.unique(dataset.Y_train[dataset.labeled_idxs], return_counts=True)
+        pool_distribution = dict(zip(uniques[0], uniques[1]))
+        pool_distribution_dict = "{\n"
+        for key, value in pool_distribution.items():
+            pool_distribution_dict += f"    {key}: {value},\n"
+        pool_distribution_dict += "}"
+
+        logger.debug("Labeled pool distribution:\n%s\n", pool_distribution_dict)
+
         # Query unlabeled pool
         query_idxs = strategy.query(args.n_query)
+
+        logger.debug(f"Round {rd} queried digits: {dataset.Y_train[query_idxs]}\n")
 
         # Update the dataset with queried indices
         strategy.update(query_idxs)
@@ -92,6 +107,26 @@ def main(args):
         preds = strategy.predict(dataset.get_validation_data())
         acc = (dataset.Y_valid == preds).sum().item() / len(dataset.Y_valid)
 
+        correct = np.unique(dataset.Y_valid[dataset.Y_valid == preds], return_counts=True)
+        mistakes = np.unique(dataset.Y_valid[dataset.Y_valid != preds], return_counts=True)
+
+        performance = defaultdict(lambda: [0, 0])
+
+        # Loop through all digits (assuming digits range from 0 to 9)
+        for digit in range(10):
+            if digit in correct[0]:
+                performance[digit][0] = correct[1][np.where(correct[0] == digit)][0]
+            if digit in mistakes[0]:
+                performance[digit][1] = mistakes[1][np.where(mistakes[0] == digit)][0]
+                
+        performance_str = "{\n"
+        for key, (correct_count, mistake_count) in performance.items():
+            performance_str += f"    {key}: [{colored(correct_count, 'green')}, {colored(mistake_count, 'red')}],\n"
+        performance_str += "}"
+
+        # Log the colored performance string
+        logger.debug("Performance:\n%s\n", performance_str)
+            
         # Save the best accuracy
         if acc > best_acc:
             best_acc = acc

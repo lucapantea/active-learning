@@ -5,14 +5,16 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from config import logger
 
 class Model:
     def __init__(self, net, params, device):
         self.params = params
         self.device = device
-        self.clf = net(**params).to(self.device)
+        self.net = net
         
     def fit(self, data):
+        self.clf = self.net(**self.params).to(self.device)
         self.clf.train()
         
         n_epoch = self.params['epochs']
@@ -62,7 +64,7 @@ class Model:
         return probs
     
     def predict_prob_dropout(self, data, n_drop=10):
-        self.clf.train()
+        self.clf.eval()
         probs = torch.zeros([len(data), len(np.unique(data.target))])
         loader = DataLoader(data, shuffle=False, **self.params['test_args'])
         for i in range(n_drop):
@@ -77,7 +79,7 @@ class Model:
         return probs
     
     def predict_prob_dropout_split(self, data, n_drop=10):
-        self.clf.train()
+        self.clf.eval()
         probs = torch.zeros([n_drop, len(data), len(np.unique(data.target))])
         loader = DataLoader(data, shuffle=False, **self.params['test_args'])
         for i in range(n_drop):
