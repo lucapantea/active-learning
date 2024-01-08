@@ -13,10 +13,10 @@ module load 2022
 module load Anaconda3/2022.05
 
 # Activate conda environment
-source activate active-learning
+source activate active-learning-luca
 
 # Change to working directory
-cd $HOME/active-learning
+cd $HOME/active-learning-luca
 
 # Ensure wandb online
 wandb online

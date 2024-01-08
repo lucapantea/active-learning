@@ -1,5 +1,5 @@
 
-name: active-learning
+name: active-learning-luca
 channels:
   - pytorch
   - conda-forge

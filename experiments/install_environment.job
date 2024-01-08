@@ -12,5 +12,5 @@ module purge
 module load 2022
 module load Anaconda3/2022.05
 
-cd $HOME/active-learning/
+cd $HOME/active-learning-luca/
 conda env create -f environment.yml
