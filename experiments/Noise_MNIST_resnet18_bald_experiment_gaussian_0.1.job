@@ -2,7 +2,7 @@
 
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
-#SBATCH --job-nameNoise_=MNIST_resnet18_bald_experiment
+#SBATCH --job-name=Noise_MNIST_resnet18_bald_experiment
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=13:00:00
