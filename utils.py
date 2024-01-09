@@ -57,8 +57,8 @@ def get_noise(noise, noise_rate):
         noise_transform = AddGaussianNoise(mean=0., std=1.)
     elif noise == 'salt_and_pepper':
         from datasets import AddSaltAndPepperNoise
-        logger.info(f'Adding Salt and Pepper Noise with noise rate={noise_rate}')  
-        noise_transform = AddSaltAndPepperNoise(noise_rate=0.1)
+        logger.info(f'Adding Salt and Pepper Noise (0.1 rate) with noise rate={noise_rate}')  
+        noise_transform = AddSaltAndPepperNoise(rate=0.1)
     else:
         raise NotImplementedError(f'Noise {noise} not implemented')
     return noise_transform

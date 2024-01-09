@@ -77,7 +77,7 @@ def main(args):
     strategy.fit()
     preds = strategy.predict(dataset.get_validation_data())
     acc = (dataset.Y_valid == preds).sum().item() / len(dataset.Y_valid)
-    logger.info(f"Round 0 validation accuracy: {acc}")
+    logger.info(f"Round 0 validation accuracy: {colored(acc, 'green')}")
 
     # Active Learning Rounds
     for rd in range(1, args.n_round+1):
@@ -131,7 +131,7 @@ def main(args):
         if acc > best_acc:
             best_acc = acc
 
-        logger.info(f"Round {rd} validation accuracy: {acc}")
+        logger.info(f"Round {rd} validation accuracy: {colored(acc, 'green')}")
         logger.debug(f"Round {rd} labeled pool: {dataset.labeled_idxs.sum()}")
         logger.debug(f"Round {rd} unlabeled pool: {dataset.n_pool-dataset.labeled_idxs.sum()}")
 
@@ -166,3 +166,4 @@ if __name__ == '__main__':
     else:
         logger.info(f"Running experiment with seed {args.seed}")
         main(args)
+    logger.info(f"Finished experiment for configuration:\n{vars(args)}")
