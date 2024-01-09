@@ -5,7 +5,7 @@
 #SBATCH --job-name=Noise_MNIST_Experiment-realistic-extended
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=48:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=../out/slurm_output_%x.out
 
 module purge
