@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --job-name=System_healthcheck
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --time=48:00:00
+#SBATCH --output=../out/slurm_output_%x.out
+
+module purge
+module load 2022
+module load Anaconda3/2022.05
+
+# Create environment specific variables
+source ../.env
+
+# Activate conda environment
+source activate $PROJECT_ENV_NAME
+
+# Change to working directory
+cd $PROJECT_DIR
+
+# Get current working directory
+echo "Current working directory: "
+pwd
+
+echo "Environemnt list: "
+conda env list
+
+echo "Current conda environment: "
+conda info --envs | grep $PROJECT_ENV_NAME
