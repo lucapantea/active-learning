@@ -1,0 +1,49 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --job-name=Noise_MNIST_Experiment-realistic-extended
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --time=48:00:00
+#SBATCH --output=../out/slurm_output_%x.out
+
+module purge
+module load 2022
+module load Anaconda3/2022.05
+
+# Create environment specific variables
+source ../.env
+
+# Activate conda environment
+source activate $PROJECT_ENV_NAME
+
+# Change to working directory
+cd $PROJECT_DIR
+
+# Ensure wandb online
+wandb online
+
+n_init_labeled=(100)
+num_valid=(300)
+n_query=(10) #50 100)
+
+for n in "${n_init_labeled[@]}"; do
+    for v in "${num_valid[@]}"; do
+        for q in "${n_query[@]}"; do
+            python main.py \
+                           --experiment \
+                           --debug \
+                           --strategy random \
+                           --dataset mnist \
+                           --model lenet \
+                           --epochs 100 \
+                           --n_round 100 \
+                           --num_valid $v \
+                           --n_init_labeled $n \
+                           --n_query $q \
+                           --noise gaussian \
+                           --noise_rate 0.1
+        done
+    done
+done
