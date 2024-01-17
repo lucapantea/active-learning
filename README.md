@@ -83,7 +83,7 @@ Specify arguments according to the `config.py` file for custom configurations.
 The project conducts experiments to test different active learning strategies and deep learning models under various conditions, focusing on noise effects and malicious labelling.
 
 # Licence
-[MIT](LICENCE)
+[MIT](LICENSE)
 
 ## Contributing
 Contributions are welcome. Please follow standard GitHub pull request processes for proposing changes.
